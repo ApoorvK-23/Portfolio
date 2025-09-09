@@ -1,64 +1,110 @@
-'use client';
-import { useMemo, useState } from 'react';
-import type { Project } from '@/lib/projects';
+"use client";
+
+import { useMemo, useState, useEffect } from "react";
+import type { Project } from "@/lib/projects";
 
 type Props = {
-  projects: Project[];
-  onFiltered: (filtered: Project[]) => void;
-}
+  items: Project[];
+  onFilter: (filtered: Project[]) => void;
+};
 
-export default function Filters({ projects, onFiltered }: Props) {
-  const [q, setQ] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
-  const [year, setYear] = useState<string>('all');
+export default function Filters({ items, onFilter }: Props) {
+  const [query, setQuery] = useState("");
+  const [activeTags, setActiveTags] = useState<string[]>([]);
 
-  const allTags = useMemo(() => {
-    return Array.from(new Set(projects.flatMap(p => p.tags))).sort();
-  }, [projects]);
-  const years = useMemo(() => {
-    return Array.from(new Set(projects.map(p => p.year))).sort((a,b)=>b-a);
-  }, [projects]);
+  // Unique tags from items
+  const tags = useMemo(() => {
+    const set = new Set<string>();
+    items.forEach((p) => p.tags?.forEach((t) => set.add(t)));
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [items]);
 
+  // Apply filters
   const filtered = useMemo(() => {
-    return projects.filter(p => {
-      const matchesQ = !q || p.title.toLowerCase().includes(q.toLowerCase()) || p.description.toLowerCase().includes(q.toLowerCase());
-      const matchesTags = tags.length===0 || tags.every(t => p.tags.includes(t));
-      const matchesYear = year === 'all' || String(p.year) === year;
-      return matchesQ && matchesTags && matchesYear;
-    });
-  }, [projects, q, tags, year]);
+    const q = query.trim().toLowerCase();
+    return items.filter((p) => {
+      const matchesQuery =
+        !q ||
+        p.title.toLowerCase().includes(q) ||
+        p.blurb.toLowerCase().includes(q) ||
+        (p.tags || []).some((t) => t.toLowerCase().includes(q));
 
-  // push filtered up
-  useMemo(() => onFiltered(filtered), [filtered, onFiltered]);
+      const matchesTags =
+        activeTags.length === 0 ||
+        activeTags.every((t) => (p.tags || []).includes(t));
+
+      return matchesQuery && matchesTags;
+    });
+  }, [items, query, activeTags]);
+
+  // Notify parent when filtered changes
+  useEffect(() => {
+    onFilter(filtered);
+  }, [filtered, onFilter]);
+
+  function toggleTag(tag: string) {
+    setActiveTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  }
 
   return (
-    <div className="card p-4 space-y-4">
-      <div>
+    <div className="card" style={{ padding: "0.8rem", marginBottom: "1rem" }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr",
+          gap: "0.6rem",
+        }}
+      >
+        {/* Search */}
         <input
-          placeholder="Search projects, e.g. Retail, RAG, KNN"
-          value={q}
-          onChange={e=>setQ(e.target.value)}
-          className="w-full border border-ink-200 rounded-xl px-3 py-2"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search projects (title, blurb, tags)…"
+          aria-label="Search projects"
+          style={{
+            width: "100%",
+            padding: "0.6rem 0.8rem",
+            borderRadius: 10,
+            border: "1px solid var(--border)",
+            background: "rgba(255,255,255,0.02)",
+            color: "var(--foreground)",
+            outline: "none",
+          }}
         />
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {allTags.map(t=>{
-          const active = tags.includes(t);
-          return (
-            <button key={t} onClick={()=>setTags(s=>active? s.filter(x=>x!==t): [...s,t])}
-              className={`badge ${active? 'bg-ink-900 text-white border-ink-900' : ''}`}>
-              {t}
-            </button>
-          );
-        })}
-      </div>
-      <div className="flex items-center gap-2 text-sm">
-        <span className="text-ink-600">Year</span>
-        <select value={year} onChange={e=>setYear(e.target.value)} className="border rounded-md px-2 py-1">
-          <option value="all">All</option>
-          {years.map(y=>(<option key={y} value={String(y)}>{y}</option>))}
-        </select>
+
+        {/* Tag chips */}
+        <div style={{ display: "flex", gap: ".4rem", flexWrap: "wrap" }}>
+          {tags.map((t) => {
+            const active = activeTags.includes(t);
+            return (
+              <button
+                key={t}
+                onClick={() => toggleTag(t)}
+                className="badge"
+                style={{
+                  cursor: "pointer",
+                  borderColor: active
+                    ? "rgba(59,130,246,0.6)"
+                    : "var(--border)",
+                  background: active
+                    ? "rgba(59,130,246,0.18)"
+                    : "transparent",
+                }}
+              >
+                {t}
+              </button>
+            );
+          })}
+          {tags.length === 0 && (
+            <span className="badge" style={{ opacity: 0.7 }}>
+              No tags found
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
 }
+
