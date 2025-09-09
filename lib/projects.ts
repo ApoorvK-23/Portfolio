@@ -95,27 +95,27 @@ const rawProjects: Project[] = [
     },
   },
   
-  {
-    slug: "contract-assistant",
-    title: "Contract Analysis Assistant (GenAI)",
-    blurb:
-      "A lightweight RAG assistant to summarize clauses, flag risks, and extract key terms for procurement teams.",
-    tags: ["Generative AI", "RAG", "FastAPI", "Streamlit"],
-    image: "/projects/sample-3.jpg",
-    links: {
-      liveDemo: "#",
-      code: "https://github.com/your-github/contract-assistant",
-    },
-    content: {
-      overview:
-        "Prototype assistant for contract triage across NDAs, MSAs, and SOWs.",
-      problem: "Manual review is slow and inconsistent across stakeholders.",
-      approach:
-        "Chunking, hybrid search, prompt templates; explainable highlights; guardrails for PII.",
-      outcome:
-        "Faster triage and clearer summaries for non-legal users.",
-    },
-  },
+  // {
+  //   slug: "contract-assistant",
+  //   title: "Contract Analysis Assistant (GenAI)",
+  //   blurb:
+  //     "A lightweight RAG assistant to summarize clauses, flag risks, and extract key terms for procurement teams.",
+  //   tags: ["Generative AI", "RAG", "FastAPI", "Streamlit"],
+  //   image: "/projects/sample-3.jpg",
+  //   links: {
+  //     liveDemo: "#",
+  //     code: "https://github.com/your-github/contract-assistant",
+  //   },
+  //   content: {
+  //     overview:
+  //       "Prototype assistant for contract triage across NDAs, MSAs, and SOWs.",
+  //     problem: "Manual review is slow and inconsistent across stakeholders.",
+  //     approach:
+  //       "Chunking, hybrid search, prompt templates; explainable highlights; guardrails for PII.",
+  //     outcome:
+  //       "Faster triage and clearer summaries for non-legal users.",
+  //   },
+  // },
 ];
 
 // ------------- Exports -------------
