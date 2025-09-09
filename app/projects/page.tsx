@@ -6,7 +6,7 @@ import { projects as allProjects, type Project } from "@/lib/projects";
 import ProjectCard from "@/components/ProjectCard";
 import Filters from "@/components/Filters";
 
-export const metadata = { title: "Projects — Apoorv Kulshrestha" };
+// export const metadata = { title: "Projects — Apoorv Kulshrestha" };
 
 export default function ProjectsPage() {
   const [filtered, setFiltered] = useState<Project[]>(allProjects);
